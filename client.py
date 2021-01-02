@@ -1,24 +1,15 @@
-from connector.connection import Connection, ConnectionException
-from communications.console_reader import ConsoleReader
-import sys
+from communications.handler import UrlHandler
+from tools.exceptions import MyException
 
 
-def main(url: str, port: int = 80):
-    connect = Connection(url, port)
-    reader = ConsoleReader()
+def main(url: str):
     try:
-        connect.create_connection()
-        while True:
-            message = reader.get_user_message()
-            if not reader.is_ready:
-                break
-            connect.send_message(message)
-            print(connect.get_answer() + b'\n\n')
-    except ConnectionException as e:
-        print(e.get_msg())
-    finally:
-        connect.close()
+        answer = UrlHandler().get_page_by_url(url)
+        print(answer)
+    except MyException as exc:
+        print(exc.get_msg())
 
 
 if __name__ == '__main__':
-    main(sys.argv[1], int(sys.argv[2]))
+    main('http://kadm.kmath.ru/')
+    # main('http://www.google.com/')

@@ -1,5 +1,8 @@
 import re
 
+from connector.url_parser import URLParser
+from tools.exceptions import ParseException
+
 
 class HTTPParser:
 
@@ -37,12 +40,23 @@ class HTTPParser:
     def code(self):
         return self._code
 
+    def get_location(self, url_parser: URLParser) -> str:
+        match = re.findall(b'Location: (.*?)\r\n', self._text)
+        if not match:
+            raise ParseException('Ошибочный ответ сервера!')
+
+        location = match[0].decode()
+        if not location.startswith('http'):
+            location = f'{url_parser.protocol}://{url_parser.host}/{location}'
+        return location
+
     def _get_body(self) -> str:
-        start_index = self._text.find(rb'\r\n\r\n') + 8
+        start_index = self._text.find(b'\r\n\r\n') + 4
         body = self._text[start_index:]
 
-        charset = re.findall(rb'charset=(.*?)\\r\\n', self._text)[0].decode()
-        if not charset:
-            charset = 'utf-8'
+        charset = 'utf-8'
+        find_charsets = re.findall(rb'charset=(.*?)\r\n', self._text)
+        if find_charsets:
+            charset = find_charsets[0].decode()
 
         return body.decode(charset)
