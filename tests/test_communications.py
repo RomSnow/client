@@ -1,6 +1,7 @@
 import unittest
 
 from communications.handler import UrlHandler
+from communications.parse import Parser
 
 
 class TestCommunicationCase(unittest.TestCase):
@@ -9,6 +10,13 @@ class TestCommunicationCase(unittest.TestCase):
         with open('test_ans.txt') as file:
             text = file.read()
         self.assertTrue(body.startswith('<HTML>'))
+
+    def test_parse(self):
+        parser = Parser()
+
+        args = parser.parse_args(['-f', 'file', 'http://google.com/'])
+        self.assertEqual(args.url[0], 'http://google.com/')
+        self.assertEqual(args.file, 'file')
 
 
 if __name__ == '__main__':

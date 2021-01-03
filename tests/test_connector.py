@@ -53,6 +53,14 @@ class ConnectorTestCases(unittest.TestCase):
         ans = connection.get_answer()
         self.assertTrue(ans.startswith(b'HTTP/1.1 200'))
 
+    def test_https(self):
+        connection = Connection('www.google.com', 'https')
+        connection.create_connection()
+        connection.send_message('GET / HTTP/1.1\r\n'
+                                'Host: www.google.com\r\n\r\n')
+        ans = connection.get_answer()
+        self.assertTrue(ans.startswith(b'HTTP/1.1 200'))
+
 
 if __name__ == '__main__':
     unittest.main()
